@@ -33,8 +33,6 @@ describe('image module testing', () => {
   });
 
   it('should return an image when image exists', () => {
-    //saveImageToThumb()
-
     doesImageExist({
       filename: 'fjord',
       fileType: '.jpg',

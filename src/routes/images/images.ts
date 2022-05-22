@@ -8,17 +8,16 @@ const images = express.Router();
 interface RequestParameters {
   filename: string;
   fileType: string;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
 }
 
-images.get('/', (req, res) => {
-  console.log(req.query);
+images.get('/', (req: express.Request, res: express.Response) => {
   const urlParameter = saveUnwrappURLParameters(req.query);
 
-  const imageExists = doesImageExist(urlParameter)
-    .then(data => {
-      sendResizedImageResponse(data, 'jpg', res);
+  doesImageExist(urlParameter)
+    .then((data: Buffer) => {
+      res.status(200).type(urlParameter.fileType).send(data);
     })
     .catch(() => {
       //Image does not yet exist
@@ -30,9 +29,7 @@ images.get('/', (req, res) => {
           return;
         }
 
-        saveImageToThumb(data, urlParameter).then(() =>
-          sendResizedImageResponse(data, 'jpg', res)
-        );
+        res.status(200).type(urlParameter.fileType).send(data);
       });
     });
 });
@@ -43,28 +40,6 @@ function getAbsolutePathForImage(
   topFolder: string
 ): string {
   return resolve(`assets/${topFolder}/${imageName}${imageType}`);
-}
-
-function sendResizedImageResponse(
-  image: Buffer,
-  imageType: string,
-  res: express.Response
-): void {
-  res.status(200).type(imageType).send(image);
-}
-
-function saveImageToThumb(
-  image: Buffer,
-  urlParameter: RequestParameters
-): Promise<void> {
-  return fs.writeFile(
-    getAbsolutePathForImage(
-      `${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps.jpg`,
-      urlParameter.fileType,
-      'converted'
-    ),
-    image
-  );
 }
 
 function doesImageExist(urlParameter: RequestParameters): Promise<Buffer> {
@@ -80,10 +55,10 @@ function doesImageExist(urlParameter: RequestParameters): Promise<Buffer> {
 }
 
 //Missing return parameter
-async function resizeImage(
+function resizeImage(
   urlParameter: RequestParameters
 ): Promise<Buffer | string> {
-  return await sharp(
+  return sharp(
     getAbsolutePathForImage(
       urlParameter.filename,
       urlParameter.fileType,
@@ -91,20 +66,30 @@ async function resizeImage(
     )
   )
     .resize(urlParameter.width, urlParameter.height)
+    .toFile(
+      getAbsolutePathForImage(
+        `${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps.jpg`,
+        urlParameter.fileType,
+        'converted'
+      ),
+      (error: Error) => {
+        return `Error found while saving: ${error}`;
+      }
+    )
     .jpeg()
     .toBuffer()
-    .then(data => {
+    .then((data: Buffer) => {
       return data;
     })
-    .catch(error => {
+    .catch((error: Error) => {
       return `Error found while resizing: ${error}`;
     });
 }
 
 function saveUnwrappURLParameters(parameters: object): RequestParameters {
   return {
-    filename: (parameters as RequestParameters).filename
-      ? (parameters as RequestParameters).filename
+    filename: ((parameters as RequestParameters).filename as string)
+      ? ((parameters as RequestParameters).filename as string)
       : 'fjord',
     fileType: '.jpg',
     width: Number((parameters as RequestParameters).width)
