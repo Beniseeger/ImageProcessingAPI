@@ -1,13 +1,13 @@
-import { rejects } from 'assert';
 import express from 'express';
-import path from 'path';
 import sharp from 'sharp';
-//import {promises as fs} from fs;
+import { promises as fs } from 'fs';
+import { resolve } from 'path';
 
 const images = express.Router();
 
 interface RequestParameters {
   filename: string;
+  fileType: string;
   width?: number;
   height?: number;
 }
@@ -16,57 +16,111 @@ images.get('/', (req, res) => {
   console.log(req.query);
   const urlParameter = saveUnwrappURLParameters(req.query);
 
-  resizeImage(urlParameter).then(data => {
-    console.log('data: ', typeof data);
+  const imageExists = doesImageExist(urlParameter)
+    .then(data => {
+      sendResizedImageResponse(data, 'jpg', res);
+    })
+    .catch(() => {
+      //Image does not yet exist
+      resizeImage(urlParameter).then((data): void => {
+        console.log('data: ', typeof data);
 
-    if (typeof data === 'string') {
-      console.error(data);
-      res.status(404).send(data);
-      return;
-    }
+        if (typeof data === 'string') {
+          res.status(404).send(data);
+          return;
+        }
 
-    res.status(200).type('jpg').send(data);
-  });
+        saveImageToThumb(data, urlParameter).then(() =>
+          sendResizedImageResponse(data, 'jpg', res)
+        );
+      });
+    });
 });
 
-/*function sendResizedFileToUser(bufferImage: Buffer): never {
-  const base64Data = data.toString('base64');
+function getAbsolutePathForImage(
+  imageName: string,
+  imageType: string,
+  topFolder: string
+): string {
+  return resolve(`assets/${topFolder}/${imageName}${imageType}`);
+}
 
-  
-}*/
+function sendResizedImageResponse(
+  image: Buffer,
+  imageType: string,
+  res: express.Response
+): void {
+  res.status(200).type(imageType).send(image);
+}
+
+function saveImageToThumb(
+  image: Buffer,
+  urlParameter: RequestParameters
+): Promise<void> {
+  return fs.writeFile(
+    getAbsolutePathForImage(
+      `${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps.jpg`,
+      urlParameter.fileType,
+      'converted'
+    ),
+    image
+  );
+}
+
+function doesImageExist(urlParameter: RequestParameters): Promise<Buffer> {
+  //fs.readdir(getAbsolutePathForImage(`${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps.jpg`, 'converted'))
+
+  return fs.readFile(
+    getAbsolutePathForImage(
+      `${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps.jpg`,
+      urlParameter.fileType,
+      'converted'
+    )
+  );
+}
 
 //Missing return parameter
 async function resizeImage(
-  urlParameters: RequestParameters
+  urlParameter: RequestParameters
 ): Promise<Buffer | string> {
   return await sharp(
-    `/Users/beni/Udacity/Projekte/Image_Api/src/assets/full/${urlParameters.filename}`
+    getAbsolutePathForImage(
+      urlParameter.filename,
+      urlParameter.fileType,
+      'full'
+    )
   )
-    .resize(urlParameters.width, urlParameters.height)
+    .resize(urlParameter.width, urlParameter.height)
     .jpeg()
     .toBuffer()
     .then(data => {
-      console.log('returnd with: ', data);
       return data;
     })
     .catch(error => {
-      return `Error found: ${error}`;
+      return `Error found while resizing: ${error}`;
     });
 }
 
 function saveUnwrappURLParameters(parameters: object): RequestParameters {
-  //let resultParameterObject: RequestParameters;
-
-  try {
-    return {
-      filename: (parameters as RequestParameters).filename,
-      width: Number((parameters as RequestParameters).width),
-      height: Number((parameters as RequestParameters).height),
-    } as RequestParameters;
-  } catch (err) {
-    console.log(`Error: ${err}`);
-    return { filename: 'test', width: 1, height: 1 } as RequestParameters;
-  }
+  return {
+    filename: (parameters as RequestParameters).filename
+      ? (parameters as RequestParameters).filename
+      : 'fjord',
+    fileType: '.jpg',
+    width: Number((parameters as RequestParameters).width)
+      ? Number((parameters as RequestParameters).width)
+      : 100,
+    height: Number((parameters as RequestParameters).height)
+      ? Number((parameters as RequestParameters).height)
+      : 100,
+  } as RequestParameters;
 }
 
 export default images;
+
+export {
+  saveUnwrappURLParameters,
+  resizeImage,
+  doesImageExist,
+  getAbsolutePathForImage,
+};
