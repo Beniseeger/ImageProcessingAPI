@@ -27,4 +27,4 @@ The project uses the following scripts:
 
 ## Version Control
 
-During this project git was used in a local repository.
+During this project git was used in a local and now remote repository.
