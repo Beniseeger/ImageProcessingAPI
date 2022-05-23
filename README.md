@@ -6,6 +6,8 @@ The main route of the project is localhost:3000/images. If the route is called t
 The files should be accessed without the file extension otherwise the image is not found.
 During the whole development phase the visual studio prettier plugin was used instead of the command line version.
 
+Becasue the node modules are not commited, please run npm install before using the project.
+
 ## Project structure
 
 When building the project, all files will be compiled to the build folder. Use node ./build/. to start the server after building it.
