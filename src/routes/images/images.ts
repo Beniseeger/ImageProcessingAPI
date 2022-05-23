@@ -22,15 +22,17 @@ images.get('/', (req: express.Request, res: express.Response) => {
     })
     .catch(() => {
       //Image does not yet exist and needs to be resized.
-      resizeImage(urlParameter).then((bufferedImage: Buffer | string): void => {
-        //Check if an error was thrown during resizing
-        if (typeof bufferedImage === 'string') {
-          res.status(404).send(bufferedImage);
-          return;
-        }
+      resizeImage(urlParameter).then(
+        (resizingResult: Buffer | string): void => {
+          //Check if an error was thrown during resizing
+          if (typeof resizingResult === 'string') {
+            res.status(404).send(resizingResult);
+            return;
+          }
 
-        res.status(200).type(urlParameter.fileType).send(bufferedImage);
-      });
+          res.status(200).type(urlParameter.fileType).send(resizingResult);
+        }
+      );
     });
 });
 
@@ -92,7 +94,7 @@ function resizeImage(
         'converted'
       ),
       (error: Error) => {
-        return `Error found while saving: ${error}`;
+        return `We could not save your image to the cache due to the following reason: \n${error}`;
       }
     )
     .jpeg()
@@ -101,7 +103,7 @@ function resizeImage(
       return data;
     })
     .catch((error: Error) => {
-      return `Error found while resizing: ${error}`;
+      return `We could not resize your image due to the following reason: \n${error}`;
     });
 }
 

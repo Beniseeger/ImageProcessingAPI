@@ -31,7 +31,7 @@ describe('image module testing', () => {
             height: 100,
             width: 100,
         }).then((result) => {
-            expect(result).toContain('Error found while resizing: ');
+            expect(result).toContain('We could not resize your image due to the following reason:');
         });
     });
     it('should return a cached image when image exists', () => {

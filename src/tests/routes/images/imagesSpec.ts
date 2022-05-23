@@ -28,7 +28,9 @@ describe('image module testing', (): void => {
       height: 100,
       width: 100,
     }).then((result: Buffer | string): void => {
-      expect(result).toContain('Error found while resizing: ');
+      expect(result).toContain(
+        'We could not resize your image due to the following reason:'
+      );
     });
   });
 

@@ -33,7 +33,7 @@ describe('testing image route', () => {
             request
                 .get('/images?filename=nonExistImage')
                 .then((result) => {
-                expect(result.text).toContain('Error found while');
+                expect(result.text).toContain('We could not resize your image due to the following reason:');
             });
         });
     });

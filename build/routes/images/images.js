@@ -18,21 +18,21 @@ images.get('/', (req, res) => {
     })
         .catch(() => {
         //Image does not yet exist and needs to be resized.
-        resizeImage(urlParameter).then((image) => {
+        resizeImage(urlParameter).then((resizingResult) => {
             //Check if an error was thrown during resizing
-            if (typeof image === 'string') {
-                res.status(404).send(image);
+            if (typeof resizingResult === 'string') {
+                res.status(404).send(resizingResult);
                 return;
             }
-            res.status(200).type(urlParameter.fileType).send(image);
+            res.status(200).type(urlParameter.fileType).send(resizingResult);
         });
     });
 });
 /**
  * Returns an absolute Path for a given image name
  *
- * @param imageName name of the image which will be looked after
- * @param imageType image type
+ * @param imageName name of the image which will be looked after.
+ * @param imageType image type.
  * @param topFolder top level folder where the image is located.
  * @returns
  */
@@ -60,7 +60,7 @@ function resizeImage(urlParameter) {
     return (0, sharp_1.default)(getAbsolutePathForImage(urlParameter.filename, urlParameter.fileType, 'full'))
         .resize(urlParameter.width, urlParameter.height)
         .toFile(getAbsolutePathForImage(`${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps`, urlParameter.fileType, 'converted'), (error) => {
-        return `Error found while saving: ${error}`;
+        return `We could not save your image to the cache due to the following reason: \n${error}`;
     })
         .jpeg()
         .toBuffer()
@@ -68,7 +68,7 @@ function resizeImage(urlParameter) {
         return data;
     })
         .catch((error) => {
-        return `Error found while resizing: ${error}`;
+        return `We could not resize your image due to the following reason: \n${error}`;
     });
 }
 exports.resizeImage = resizeImage;
