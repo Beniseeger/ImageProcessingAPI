@@ -1,9 +1,16 @@
-import express from 'express';
+import express, { NextFunction } from 'express';
 
+/**
+ * Returns the api point accessed by the user.
+ * @param req request paramters of type express.Request
+ * @param res response parameters of type express.Reponse
+ * @param next next middleware
+ * @returns the api point accessed by the user and logs it in the console.
+ */
 const loggerMiddleware = (
   req: express.Request,
   res: express.Response,
-  next: Function
+  next: NextFunction
 ): string => {
   console.log(`The endpoint: ${req.url} has been accessed`);
 
@@ -11,19 +18,4 @@ const loggerMiddleware = (
   return `The endpoint: ${req.url} has been accessed`;
 };
 
-const validateURLParameters = (
-  req: express.Request,
-  res: express.Response,
-  next: Function
-) => {
-  try {
-    parseInt(req.query.height as string);
-    parseInt(req.query.width as string);
-  } catch (error) {
-    res.status(404).send(error);
-  }
-
-  next();
-};
-
-export default { loggerMiddleware, validateURLParameters };
+export default loggerMiddleware;

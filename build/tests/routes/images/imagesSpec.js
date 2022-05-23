@@ -30,19 +30,30 @@ describe('image module testing', () => {
             fileType: '.jpg',
             height: 100,
             width: 100,
-        }).then(result => {
+        }).then((result) => {
             expect(result).toContain('Error found while resizing: ');
         });
     });
-    it('should return an image when image exists', () => {
-        //saveImageToThumb()
-        (0, images_1.doesImageExist)({
+    it('should return a cached image when image exists', () => {
+        (0, images_1.resizeImage)({
             filename: 'fjord',
             fileType: '.jpg',
             height: 100,
             width: 100,
-        }).then((result) => {
-            expect(result).toBeInstanceOf(Buffer);
+        }).then(() => {
+            (0, images_1.doesImageExist)({
+                filename: 'fjord',
+                fileType: '.jpg',
+                height: 100,
+                width: 100,
+            })
+                .then((result) => {
+                expect(result).toBeInstanceOf(Buffer);
+            })
+                .catch(() => {
+                //Error would be thrown if a image does not exists
+                expect(true).toBeFalse();
+            });
         });
     });
     it('should return an error when image does not exist', () => __awaiter(void 0, void 0, void 0, function* () {

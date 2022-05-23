@@ -11,6 +11,6 @@ const port = 3000;
 app.listen(port, () => {
     console.log(`Server has started and is listening on localhost:${port}`);
 });
-app.use(middleware_1.default.loggerMiddleware, middleware_1.default.validateURLParameters);
+app.use(middleware_1.default);
 app.use('/', index_1.default);
 exports.default = app;

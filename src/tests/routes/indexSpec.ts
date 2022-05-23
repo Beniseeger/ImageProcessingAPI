@@ -1,5 +1,5 @@
 import app from '../../index';
-import supertest, { SuperTest } from 'supertest';
+import supertest from 'supertest';
 
 const request = supertest(app);
 
@@ -29,7 +29,7 @@ describe('testing image route', () => {
   });
 
   describe('testing error responses of image route', () => {
-    it('should return an error when image is not found', () => {
+    it('should return an error when image is not found', (): void => {
       request
         .get('/images?filename=nonExistImage')
         .then((result: supertest.Response): void => {

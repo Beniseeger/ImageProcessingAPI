@@ -6,8 +6,8 @@ import {
   saveUnwrappURLParameters,
 } from '../../../routes/images/images';
 
-describe('image module testing', () => {
-  it('should return the default urlParameters', () => {
+describe('image module testing', (): void => {
+  it('should return the default urlParameters', (): void => {
     const defaultParameters = saveUnwrappURLParameters({
       height: 'test',
       width: 'daisoj',
@@ -21,25 +21,37 @@ describe('image module testing', () => {
     });
   });
 
-  it('should return an error for non existing images', () => {
+  it('should return an error for non existing images', (): void => {
     resizeImage({
       filename: 'nonExistingImage',
       fileType: '.jpg',
       height: 100,
       width: 100,
-    }).then(result => {
+    }).then((result: Buffer | string): void => {
       expect(result).toContain('Error found while resizing: ');
     });
   });
 
-  it('should return an image when image exists', () => {
-    doesImageExist({
+  it('should return a cached image when image exists', (): void => {
+    resizeImage({
       filename: 'fjord',
       fileType: '.jpg',
       height: 100,
       width: 100,
-    }).then((result: Buffer) => {
-      expect(result).toBeInstanceOf(Buffer);
+    }).then((): void => {
+      doesImageExist({
+        filename: 'fjord',
+        fileType: '.jpg',
+        height: 100,
+        width: 100,
+      })
+        .then((result: Buffer | Error): void => {
+          expect(result).toBeInstanceOf(Buffer);
+        })
+        .catch((): void => {
+          //Error would be thrown if a image does not exists
+          expect(true).toBeFalse();
+        });
     });
   });
 
@@ -54,7 +66,7 @@ describe('image module testing', () => {
     ).toBeRejectedWithError();
   });
 
-  it('should return an absolute path for fjord image', () => {
+  it('should return an absolute path for fjord image', (): void => {
     const path = getAbsolutePathForImage('fjord', '.jpg', 'full');
 
     expect(path).toEqual(resolve('assets/full/fjord.jpg'));

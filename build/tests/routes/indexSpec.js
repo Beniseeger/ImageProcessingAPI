@@ -8,12 +8,12 @@ const supertest_1 = __importDefault(require("supertest"));
 const request = (0, supertest_1.default)(index_1.default);
 describe('testing image route', () => {
     describe('testing status response of image route', () => {
-        it('should return status 200', () => {
+        it('should return status 200 for the initial image route', () => {
             request.get('/images').then((result) => {
                 expect(result.status).toBe(200);
             });
         });
-        it('should use the default values when non matching values are inserted', () => {
+        it('should use the default values and return 200 when non matching values are inserted', () => {
             request
                 .get('/images?height=Tests&width=Test')
                 .then((result) => {

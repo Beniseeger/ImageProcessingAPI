@@ -1,16 +1,17 @@
 import middleware from '../../middleware/middleware';
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 
 describe('testing middleware', (): void => {
-  let mockRequest: Partial<Request> = { url: '/api' };
+  const mockRequest: Partial<Request> = { url: '/api' };
   let mockResponse: Partial<Response>;
 
   it('should log an entry for /api', (): void => {
-    //console.log = jasmine.createSpy('log');
-    const logMessage = middleware.loggerMiddleware(
+    const logMessage = middleware(
       mockRequest as Request,
       mockResponse as Response,
-      () => {}
+      () => {
+        console.log('Going to the next middleware');
+      }
     );
     expect(logMessage).toMatch('The endpoint: /api has been accessed');
   });
