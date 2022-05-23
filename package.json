@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/index.ts",
-    "prettier": "prettier --config .prettierrc '*.ts' --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
+    "prettier": "prettier --config .prettierrc '*.ts' --write \"**/*.+(js|ts|json)\"",
     "lint": "eslint . --ext .ts",
     "build": "npx tsc",
     "jasmine": "jasmine",

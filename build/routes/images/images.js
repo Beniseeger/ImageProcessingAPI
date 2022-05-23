@@ -47,7 +47,6 @@ exports.getAbsolutePathForImage = getAbsolutePathForImage;
  * @returns Buffer or Error if image exists or not
  */
 function doesImageExist(urlParameter) {
-    //fs.readdir(getAbsolutePathForImage(`${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps.jpg`, 'converted'))
     return fs_1.promises.readFile(getAbsolutePathForImage(`${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps`, urlParameter.fileType, 'converted'));
 }
 exports.doesImageExist = doesImageExist;

@@ -59,8 +59,6 @@ function getAbsolutePathForImage(
 function doesImageExist(
   urlParameter: RequestParameters
 ): Promise<Buffer | Error> {
-  //fs.readdir(getAbsolutePathForImage(`${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps.jpg`, 'converted'))
-
   return fs.readFile(
     getAbsolutePathForImage(
       `${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps`,
