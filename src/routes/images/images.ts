@@ -22,14 +22,14 @@ images.get('/', (req: express.Request, res: express.Response) => {
     })
     .catch(() => {
       //Image does not yet exist and needs to be resized.
-      resizeImage(urlParameter).then((image: Buffer | string): void => {
+      resizeImage(urlParameter).then((bufferedImage: Buffer | string): void => {
         //Check if an error was thrown during resizing
-        if (typeof image === 'string') {
-          res.status(404).send(image);
+        if (typeof bufferedImage === 'string') {
+          res.status(404).send(bufferedImage);
           return;
         }
 
-        res.status(200).type(urlParameter.fileType).send(image);
+        res.status(200).type(urlParameter.fileType).send(bufferedImage);
       });
     });
 });
@@ -37,8 +37,8 @@ images.get('/', (req: express.Request, res: express.Response) => {
 /**
  * Returns an absolute Path for a given image name
  *
- * @param imageName name of the image which will be looked after
- * @param imageType image type
+ * @param imageName name of the image which will be looked after.
+ * @param imageType image type.
  * @param topFolder top level folder where the image is located.
  * @returns
  */
