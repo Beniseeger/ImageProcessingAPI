@@ -1,0 +1,64 @@
+import validateInputParmeters from '../../middleware/validateImageInputMiddleware';
+import { Request, Response } from 'express';
+
+describe('testing validate middleware', (): void => {
+  let mockResponse: Partial<Response>;
+
+  it('should return a height error message when no height is provided', (): void => {
+    const mockRequest: Partial<Request> = {
+      url: '/images?width=100&filename=fjord',
+    };
+    const logMessage = validateInputParmeters(
+      mockRequest as Request,
+      mockResponse as Response,
+      () => {
+        console.log('Going to the next middleware');
+      }
+    );
+    expect(logMessage).toMatch('Please specify a height for the image!');
+  });
+
+  it('should retrun a width error message when no width is provided', (): void => {
+    const mockRequest: Partial<Request> = {
+      url: '/images?height=100&filename=fjord',
+    };
+    const logMessage = validateInputParmeters(
+      mockRequest as Request,
+      mockResponse as Response,
+      () => {
+        console.log('Going to the next middleware');
+      }
+    );
+    expect(logMessage).toMatch('Please specify a width for the image!');
+  });
+
+  it('should retrun a filename error message when no filename is provided', (): void => {
+    const mockRequest: Partial<Request> = {
+      url: '/images?height=100&width=100',
+    };
+    const logMessage = validateInputParmeters(
+      mockRequest as Request,
+      mockResponse as Response,
+      () => {
+        console.log('Going to the next middleware');
+      }
+    );
+    expect(logMessage).toMatch(
+      'Please specify an image which should be resized!'
+    );
+  });
+
+  it('should retrun No Error when all parameters are specified', (): void => {
+    const mockRequest: Partial<Request> = {
+      url: '/images?height=100&width=100&filename=fjord',
+    };
+    const logMessage = validateInputParmeters(
+      mockRequest as Request,
+      mockResponse as Response,
+      () => {
+        console.log('Going to the next middleware');
+      }
+    );
+    expect(logMessage).toMatch('No Error');
+  });
+});

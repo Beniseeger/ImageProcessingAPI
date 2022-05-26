@@ -3,7 +3,10 @@ import sharp from 'sharp';
 import { promises as fs } from 'fs';
 import { resolve } from 'path';
 
+import validateInputParmeters from '../../middleware/validateImageInputMiddleware';
+
 const images = express.Router();
+images.use(validateInputParmeters);
 
 interface RequestParameters {
   filename: string;
@@ -59,8 +62,6 @@ function getAbsolutePathForImage(
 function doesImageExist(
   urlParameter: RequestParameters
 ): Promise<Buffer | Error> {
-  //fs.readdir(getAbsolutePathForImage(`${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps.jpg`, 'converted'))
-
   return fs.readFile(
     getAbsolutePathForImage(
       `${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps`,

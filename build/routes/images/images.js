@@ -8,7 +8,9 @@ const express_1 = __importDefault(require("express"));
 const sharp_1 = __importDefault(require("sharp"));
 const fs_1 = require("fs");
 const path_1 = require("path");
+const validateImageInputMiddleware_1 = __importDefault(require("../../middleware/validateImageInputMiddleware"));
 const images = express_1.default.Router();
+images.use(validateImageInputMiddleware_1.default);
 images.get('/', (req, res) => {
     const urlParameter = saveUnwrappURLParameters(req.query);
     doesImageExist(urlParameter)
@@ -47,7 +49,6 @@ exports.getAbsolutePathForImage = getAbsolutePathForImage;
  * @returns Buffer or Error if image exists or not
  */
 function doesImageExist(urlParameter) {
-    //fs.readdir(getAbsolutePathForImage(`${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps.jpg`, 'converted'))
     return fs_1.promises.readFile(getAbsolutePathForImage(`${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps`, urlParameter.fileType, 'converted'));
 }
 exports.doesImageExist = doesImageExist;

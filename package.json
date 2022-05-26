@@ -5,20 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/index.ts",
-    "prettier": "prettier --config .prettierrc '*.ts' --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
+    "prettier": "prettier --config .prettierrc '*.ts' --write \"**/*.+(js|ts|json)\"",
     "lint": "eslint . --ext .ts",
     "build": "npx tsc",
     "jasmine": "jasmine",
     "test": "npm run build && npm run jasmine"
   },
   "author": "benjamin",
-  "license": "ISC",
+  "license": "(MIT OR Apache-2.0)",
   "dependencies": {
     "express": "^4.18.1",
-    "jasmine": "^4.1.0",
-    "jasmine-spec-reporter": "^7.0.0",
-    "sharp": "^0.30.4",
-    "supertest": "^6.2.3"
+    "sharp": "^0.30.4"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
@@ -32,8 +29,11 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jasmin": "^0.0.2",
+    "jasmine": "^4.1.0",
+    "jasmine-spec-reporter": "^7.0.0",
     "nodemon": "^2.0.16",
     "prettier": "^2.6.2",
+    "supertest": "^6.2.3",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.4"
   }
