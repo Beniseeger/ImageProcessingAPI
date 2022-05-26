@@ -8,17 +8,22 @@ const validateInputParmeters = (
   let returnMessage: string = 'No Error';
 
   if (Number.isNaN(parseInt(req.query.height as string))) {
-    res.status(400).send('Please specify a height for the image!');
     returnMessage = 'Please specify a height for the image!';
   } else if (Number.isNaN(parseInt(req.query.width as string))) {
-    res.status(400).send('Please specify a width for the image!');
     returnMessage = 'Please specify a width for the image!';
-  } else if ((req.query.filename as string) === '') {
-    res.status(400).send('Please specify an image which should be resized!');
+  } else if (
+    (req.query.filename as string) === '' ||
+    req.query.filename === undefined
+  ) {
     returnMessage = 'Please specify an image which should be resized!';
   }
 
-  next();
+  if (returnMessage === 'No Error') {
+    next();
+    return returnMessage;
+  }
+
+  res.status(400).send(returnMessage);
   return returnMessage;
 };
 
