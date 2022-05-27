@@ -34,3 +34,12 @@ The project uses the following scripts:
 ## Version Control
 
 During this project git was used in a local repository.
+
+## Resubmitting project
+
+The following things were changed:
+
+- Dependencies should only include necessary once: -> All unnecessary dependencies were moved to the devDependencies section
+- Provide instruction in the readme.md on how to start the app: -> in the section using the api a startup section with the necessary parameters was included
+- Check wether the provided url paramters are valid: -> A middleware was created which checks the url parameter for the /images route
+- Missing type information: -> The missing types were added.
