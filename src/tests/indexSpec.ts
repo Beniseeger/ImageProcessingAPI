@@ -16,3 +16,5 @@ describe('testing main endpoint', () => {
     });
   });
 });
+
+export default request;

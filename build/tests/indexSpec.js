@@ -18,3 +18,4 @@ describe('testing main endpoint', () => {
         });
     });
 });
+exports.default = request;

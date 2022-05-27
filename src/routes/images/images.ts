@@ -3,7 +3,10 @@ import sharp from 'sharp';
 import { promises as fs } from 'fs';
 import { resolve } from 'path';
 
+import validateInputParmeters from '../../middleware/validateImageInputMiddleware';
+
 const images = express.Router();
+images.use(validateInputParmeters);
 
 interface RequestParameters {
   filename: string;

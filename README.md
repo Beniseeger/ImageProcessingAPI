@@ -6,7 +6,11 @@ The main route of the project is localhost:3000/images. If the route is called t
 The files should be accessed without the file extension otherwise the image is not found.
 During the whole development phase the visual studio prettier plugin was used instead of the command line version.
 
-Becasue the node modules are not commited, please run npm install before using the project.
+# Using the API
+
+The image processing api expects the user to input the following parameters: filename, width, height. If no parameters are specified, a default image will be returned.
+A sample URL would look as follows:
+http://localhost:3000/images?width=100&height=100&filename=fjord
 
 ## Project structure
 
@@ -29,4 +33,13 @@ The project uses the following scripts:
 
 ## Version Control
 
-During this project git was used in a local and now remote repository.
+During this project git was used in a local repository.
+
+## Resubmitting project
+
+The following things were changed:
+
+- Dependencies should only include necessary once: -> All unnecessary dependencies were moved to the devDependencies section
+- Provide instruction in the readme.md on how to start the app: -> in the section using the api a startup section with the necessary parameters was included
+- Check wether the provided url paramters are valid: -> A middleware was created which checks the url parameter for the /images route
+- Missing type information: -> The missing types were added.
