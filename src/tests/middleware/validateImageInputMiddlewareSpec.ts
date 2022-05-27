@@ -1,5 +1,5 @@
 import validateInputParmeters from '../../middleware/validateImageInputMiddleware';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { mockResponse } from 'mock-req-res';
 
 describe('testing validate middleware', (): void => {

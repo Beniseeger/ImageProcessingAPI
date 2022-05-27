@@ -5,7 +5,7 @@ const validateInputParmeters = (
   res: express.Response,
   next: NextFunction
 ): string => {
-  let returnMessage: string = 'No Error';
+  let returnMessage = 'No Error';
 
   if (Number.isNaN(parseInt(req.query.height as string))) {
     returnMessage = 'Please specify a height for the image!';
