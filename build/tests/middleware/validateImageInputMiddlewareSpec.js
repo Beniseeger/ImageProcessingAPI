@@ -18,17 +18,18 @@ describe('testing validate middleware', () => {
             },
         };
         const logMessage = (0, validateImageInputMiddleware_1.default)(mockRequest, mkReponse, nextFunction);
-        expect(logMessage).toMatch('Please specify a height for the image!');
+        expect(logMessage).toMatch('Error: please specify a width and height for the api.');
     });
-    it('should retrun a width error message when no width is provided', () => {
+    it('should retrun a width error message when width is provided wrong', () => {
         const mockRequest = {
             query: {
+                width: 'hdash',
                 height: '100',
                 filename: 'fjord',
             },
         };
         const logMessage = (0, validateImageInputMiddleware_1.default)(mockRequest, mkReponse, nextFunction);
-        expect(logMessage).toMatch('Please specify a width for the image!');
+        expect(logMessage).toMatch('Error: Please enter a positive number for the width of the image!');
     });
     it('should retrun a filename error message when no filename is provided', () => {
         const mockRequest = {
@@ -38,9 +39,9 @@ describe('testing validate middleware', () => {
             },
         };
         const logMessage = (0, validateImageInputMiddleware_1.default)(mockRequest, mkReponse, nextFunction);
-        expect(logMessage).toMatch('Please specify an image which should be resized!');
+        expect(logMessage).toMatch('Error: Please specify an image by the parameter filename which should be resized!');
     });
-    it('should retrun No Error when all parameters are specified', () => {
+    it('should return No Error when all parameters are specified', () => {
         const mockRequest = {
             query: {
                 height: '100',

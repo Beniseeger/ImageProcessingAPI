@@ -8,6 +8,7 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "no-console": 0 // Remember, this means error!
+    "no-console": 0, // Remember, this means error!
+    "@typescript-eslint/explicit-function-return-type": ["error"]
   }
 }

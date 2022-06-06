@@ -43,3 +43,4 @@ The following things were changed:
 - Provide instruction in the readme.md on how to start the app: -> in the section using the api a startup section with the necessary parameters was included
 - Check wether the provided url paramters are valid: -> A middleware was created which checks the url parameter for the /images route
 - Missing type information: -> The missing types were added.
+- Url parameter sanatizing was implemented

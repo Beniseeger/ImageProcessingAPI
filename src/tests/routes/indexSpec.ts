@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import request from '../indexSpec';
 
-describe('testing image route', () => {
+describe('index route', () => {
   describe('testing status response of image route', () => {
     it('should return status 200 if all parameters are provided', () => {
       //Should return 400 because no parameters are provided
@@ -41,7 +41,9 @@ describe('testing image route', () => {
       request
         .get('/images?width=100&height=100&filename=nonExistImage')
         .then((result: supertest.Response): void => {
-          expect(result.text).toContain('Error found while');
+          expect(result.text).toContain(
+            'Please specify an image which exists in the full folder:'
+          );
         });
     });
   });

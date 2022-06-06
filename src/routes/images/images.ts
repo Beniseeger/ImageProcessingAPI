@@ -1,7 +1,6 @@
 import express from 'express';
 import sharp from 'sharp';
-import { promises as fs } from 'fs';
-import { resolve } from 'path';
+import fileSystemOperations from '../../utilities/fileSystemOperations';
 
 import validateInputParmeters from '../../middleware/validateImageInputMiddleware';
 
@@ -10,66 +9,39 @@ images.use(validateInputParmeters);
 
 interface RequestParameters {
   filename: string;
-  fileType: string;
   width: number;
   height: number;
 }
 
 images.get('/', (req: express.Request, res: express.Response) => {
-  const urlParameter = saveUnwrappURLParameters(req.query);
+  sanitizingURLParameters(req.query).then(urlParameter => {
+    if (typeof urlParameter === 'string') {
+      res.status(404).send(urlParameter);
+      return;
+    }
 
-  doesImageExist(urlParameter)
-    .then((cachedImage: Buffer | Error): void => {
-      //Image exists and a chached one is returned.
-      res.status(200).type(urlParameter.fileType).send(cachedImage);
-    })
-    .catch(() => {
-      //Image does not yet exist and needs to be resized.
-      resizeImage(urlParameter).then((image: Buffer | string): void => {
-        //Check if an error was thrown during resizing
-        if (typeof image === 'string') {
-          res.status(404).send(image);
-          return;
-        }
+    fileSystemOperations
+      .getImageFromCache(urlParameter as RequestParameters)
+      .then((cachedImage: Buffer | Error): void => {
+        //Image exists and a chached one is returned.
+        res.status(200).type('jpg').send(cachedImage);
+      })
+      .catch(() => {
+        //Image does not yet exist and needs to be resized.
+        resizeImage(urlParameter as RequestParameters).then(
+          (image: Buffer | string): void => {
+            //Check if an error was thrown during resizing
+            if (typeof image === 'string') {
+              res.status(404).send(image);
+              return;
+            }
 
-        res.status(200).type(urlParameter.fileType).send(image);
+            res.status(200).type('jpg').send(image);
+          }
+        );
       });
-    });
+  });
 });
-
-/**
- * Returns an absolute Path for a given image name
- *
- * @param imageName name of the image which will be looked after
- * @param imageType image type
- * @param topFolder top level folder where the image is located.
- * @returns
- */
-function getAbsolutePathForImage(
-  imageName: string,
-  imageType: string,
-  topFolder: string
-): string {
-  return resolve(`assets/${topFolder}/${imageName}${imageType}`);
-}
-
-/**
- * Returns an image as buffer if it exists or an error if it doesnt.
- *
- * @params urlParameters: the image to be looked out for.
- * @returns Buffer or Error if image exists or not
- */
-function doesImageExist(
-  urlParameter: RequestParameters
-): Promise<Buffer | Error> {
-  return fs.readFile(
-    getAbsolutePathForImage(
-      `${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps`,
-      urlParameter.fileType,
-      'converted'
-    )
-  );
-}
 
 /**
  * Returns a resized image and saves it to the converted folder.
@@ -81,17 +53,12 @@ function resizeImage(
   urlParameter: RequestParameters
 ): Promise<Buffer | string> {
   return sharp(
-    getAbsolutePathForImage(
-      urlParameter.filename,
-      urlParameter.fileType,
-      'full'
-    )
+    fileSystemOperations.getAbsolutePathForFile(urlParameter.filename, 'full')
   )
     .resize(urlParameter.width, urlParameter.height)
     .toFile(
-      getAbsolutePathForImage(
+      fileSystemOperations.getAbsolutePathForFile(
         `${urlParameter.filename}_${urlParameter.width}x${urlParameter.height}_thumps`,
-        urlParameter.fileType,
         'converted'
       ),
       (error: Error) => {
@@ -113,27 +80,75 @@ function resizeImage(
  * @param parameters the url parameters passed in by the user
  * @returns an object of necessary url parameters
  */
-function saveUnwrappURLParameters(parameters: object): RequestParameters {
-  return {
-    filename: ((parameters as RequestParameters).filename as string)
-      ? ((parameters as RequestParameters).filename as string)
-      : 'fjord',
-    fileType: '.jpg',
-    width: Number((parameters as RequestParameters).width)
-      ? Number((parameters as RequestParameters).width)
-      : 100,
-    height: Number((parameters as RequestParameters).height)
-      ? Number((parameters as RequestParameters).height)
-      : 100,
-  } as RequestParameters;
+function sanitizingURLParameters(
+  parameters: object
+): Promise<RequestParameters | string> {
+  //Check if the image exists
+  return fileSystemOperations
+    .doesFileExist(
+      fileSystemOperations.getAbsolutePathForFile(
+        (parameters as RequestParameters).filename as string,
+        'full'
+      )
+    )
+    .then((): string | RequestParameters => {
+      const tmpFilename = (parameters as RequestParameters).filename as string;
+
+      const tmpWidth = saveUnwrapURLParameterToNumber(
+        (parameters as RequestParameters).width as unknown as string,
+        'width'
+      );
+      const tmpHeight = saveUnwrapURLParameterToNumber(
+        (parameters as RequestParameters).height as unknown as string,
+        'height'
+      );
+
+      if (typeof tmpHeight === 'string' && typeof tmpWidth === 'string') {
+        return (tmpHeight as string) + '<br>' + (tmpWidth as string);
+      } else if (
+        typeof tmpHeight === 'string' ||
+        typeof tmpWidth === 'string'
+      ) {
+        return typeof tmpHeight === 'string'
+          ? (tmpHeight as string)
+          : (tmpWidth as string);
+      }
+
+      return {
+        filename: tmpFilename,
+        width: tmpWidth,
+        height: tmpHeight,
+      } as RequestParameters;
+    })
+    .catch((error): string => {
+      return `Please specify an image which exists in the full folder: <br> ${error}`;
+    });
+}
+
+/**
+ * Save unwraps the provided url parameters to number
+ * @param parameters the parameter which should be converted to number
+ * @returns number from provided url parameter
+ */
+
+function saveUnwrapURLParameterToNumber(
+  urlParameter: string,
+  parameterName: string
+): number | string {
+  let tmpParameter: number;
+
+  try {
+    tmpParameter = parseInt(urlParameter);
+    if (Number.isNaN(tmpParameter) || tmpParameter <= 0)
+      return `Please enter a positive number for ${parameterName} greater than 0`;
+  } catch (error) {
+    return `Error while unwrapping ${parameterName}! Please enter a number as ${parameterName}: <br>${error}`;
+  }
+
+  return tmpParameter;
 }
 
 export default images;
 
 //Export for testing purposes
-export {
-  saveUnwrappURLParameters,
-  resizeImage,
-  doesImageExist,
-  getAbsolutePathForImage,
-};
+export { sanitizingURLParameters, resizeImage };

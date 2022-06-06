@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const indexSpec_1 = __importDefault(require("../indexSpec"));
-describe('testing image route', () => {
+describe('index route', () => {
     describe('testing status response of image route', () => {
         it('should return status 200 if all parameters are provided', () => {
             //Should return 400 because no parameters are provided
@@ -40,7 +40,7 @@ describe('testing image route', () => {
             indexSpec_1.default
                 .get('/images?width=100&height=100&filename=nonExistImage')
                 .then((result) => {
-                expect(result.text).toContain('Error found while');
+                expect(result.text).toContain('Please specify an image which exists in the full folder:');
             });
         });
     });

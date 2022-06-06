@@ -1,71 +1,70 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = require("path");
 const images_1 = require("../../../routes/images/images");
-describe('image module testing', () => {
-    it('should return the default urlParameters', () => {
-        const defaultParameters = (0, images_1.saveUnwrappURLParameters)({
+describe('testing image module', () => {
+    it('should throw an error when image does not exist', () => {
+        (0, images_1.sanitizingURLParameters)({
+            filename: 'undefined',
             height: 'test',
-            width: 'daisoj',
+            width: '100',
+        })
+            .then((urlParameter) => {
+            expect(urlParameter).toContain('Please specify an image which exists in the full folder:');
+        })
+            .catch(() => {
+            //Error would be thrown if a image does not exists
+            expect(true).toBeFalse();
         });
-        expect(defaultParameters).toEqual({
-            filename: 'fjord',
-            fileType: '.jpg',
-            height: 100,
-            width: 100,
+    });
+    it('should throw an error for non positive height numbers', () => {
+        (0, images_1.sanitizingURLParameters)({
+            filename: 'fjord.jpg',
+            height: 'test',
+            width: '100',
+        })
+            .then((urlParameter) => {
+            expect(urlParameter).toContain('Please enter a positive number for height greater than 0');
+        })
+            .catch(() => {
+            //Error would be thrown if a image does not exists
+            expect(true).toBeFalse();
+        });
+    });
+    it('should throw an error for non positive width numbers', () => {
+        (0, images_1.sanitizingURLParameters)({
+            filename: 'fjord.jpg',
+            height: '100',
+            width: 'test',
+        })
+            .then((urlParameter) => {
+            expect(urlParameter).toContain('Please enter a positive number for width greater than 0');
+        })
+            .catch(() => {
+            //Error would be thrown if a image does not exists
+            expect(true).toBeFalse();
+        });
+    });
+    it('should throw an error for non existing height / width', () => {
+        (0, images_1.sanitizingURLParameters)({
+            filename: 'fjord.jpg',
+            height: '100',
+            width: 'test',
+        })
+            .then((urlParameter) => {
+            expect(urlParameter).toContain('Please enter a positive number for width greater than 0');
+        })
+            .catch(() => {
+            //Error would be thrown if a image does not exists
+            expect(true).toBeFalse();
         });
     });
     it('should return an error for non existing images', () => {
         (0, images_1.resizeImage)({
             filename: 'nonExistingImage',
-            fileType: '.jpg',
             height: 100,
             width: 100,
         }).then((result) => {
-            expect(result).toContain('Error found while resizing: ');
+            expect(result).toContain('Error found while resizing: Error: Input file is missing: ');
         });
-    });
-    it('should return a cached image when image exists', () => {
-        (0, images_1.resizeImage)({
-            filename: 'fjord',
-            fileType: '.jpg',
-            height: 100,
-            width: 100,
-        }).then(() => {
-            (0, images_1.doesImageExist)({
-                filename: 'fjord',
-                fileType: '.jpg',
-                height: 100,
-                width: 100,
-            })
-                .then((result) => {
-                expect(result).toBeInstanceOf(Buffer);
-            })
-                .catch(() => {
-                //Error would be thrown if a image does not exists
-                expect(true).toBeFalse();
-            });
-        });
-    });
-    it('should return an error when image does not exist', () => __awaiter(void 0, void 0, void 0, function* () {
-        yield expectAsync((0, images_1.doesImageExist)({
-            filename: 'nonExistingImage',
-            fileType: '.jpg',
-            height: 100,
-            width: 100,
-        })).toBeRejectedWithError();
-    }));
-    it('should return an absolute path for fjord image', () => {
-        const path = (0, images_1.getAbsolutePathForImage)('fjord', '.jpg', 'full');
-        expect(path).toEqual((0, path_1.resolve)('assets/full/fjord.jpg'));
     });
 });

@@ -1,74 +1,92 @@
-import { resolve } from 'path';
 import {
-  doesImageExist,
-  getAbsolutePathForImage,
   resizeImage,
-  saveUnwrappURLParameters,
+  sanitizingURLParameters,
 } from '../../../routes/images/images';
 
-describe('image module testing', (): void => {
-  it('should return the default urlParameters', (): void => {
-    const defaultParameters = saveUnwrappURLParameters({
-      height: 'test',
-      width: 'daisoj',
-    });
+interface RequestParameters {
+  filename: string;
+  width: number;
+  height: number;
+}
 
-    expect(defaultParameters).toEqual({
-      filename: 'fjord',
-      fileType: '.jpg',
-      height: 100,
-      width: 100,
-    });
+describe('testing image module', (): void => {
+  it('should throw an error when image does not exist', (): void => {
+    sanitizingURLParameters({
+      filename: 'undefined',
+      height: 'test',
+      width: '100',
+    })
+      .then((urlParameter: string | RequestParameters) => {
+        expect(urlParameter).toContain(
+          'Please specify an image which exists in the full folder:'
+        );
+      })
+      .catch((): void => {
+        //Error would be thrown if a image does not exists
+        expect(true).toBeFalse();
+      });
+  });
+
+  it('should throw an error for non positive height numbers', (): void => {
+    sanitizingURLParameters({
+      filename: 'fjord.jpg',
+      height: 'test',
+      width: '100',
+    })
+      .then((urlParameter: string | RequestParameters) => {
+        expect(urlParameter).toContain(
+          'Please enter a positive number for height greater than 0'
+        );
+      })
+      .catch((): void => {
+        //Error would be thrown if a image does not exists
+        expect(true).toBeFalse();
+      });
+  });
+
+  it('should throw an error for non positive width numbers', (): void => {
+    sanitizingURLParameters({
+      filename: 'fjord.jpg',
+      height: '100',
+      width: 'test',
+    })
+      .then((urlParameter: string | RequestParameters) => {
+        expect(urlParameter).toContain(
+          'Please enter a positive number for width greater than 0'
+        );
+      })
+      .catch((): void => {
+        //Error would be thrown if a image does not exists
+        expect(true).toBeFalse();
+      });
+  });
+
+  it('should throw an error for non existing height / width', (): void => {
+    sanitizingURLParameters({
+      filename: 'fjord.jpg',
+      height: '100',
+      width: 'test',
+    })
+      .then((urlParameter: string | RequestParameters) => {
+        expect(urlParameter).toContain(
+          'Please enter a positive number for width greater than 0'
+        );
+      })
+      .catch((): void => {
+        //Error would be thrown if a image does not exists
+        expect(true).toBeFalse();
+      });
   });
 
   it('should return an error for non existing images', (): void => {
     resizeImage({
       filename: 'nonExistingImage',
-      fileType: '.jpg',
       height: 100,
       width: 100,
     }).then((result: Buffer | string): void => {
-      expect(result).toContain('Error found while resizing: ');
+      expect(result).toContain(
+        'Error found while resizing: Error: Input file is missing: '
+      );
     });
-  });
-
-  it('should return a cached image when image exists', (): void => {
-    resizeImage({
-      filename: 'fjord',
-      fileType: '.jpg',
-      height: 100,
-      width: 100,
-    }).then((): void => {
-      doesImageExist({
-        filename: 'fjord',
-        fileType: '.jpg',
-        height: 100,
-        width: 100,
-      })
-        .then((result: Buffer | Error): void => {
-          expect(result).toBeInstanceOf(Buffer);
-        })
-        .catch((): void => {
-          //Error would be thrown if a image does not exists
-          expect(true).toBeFalse();
-        });
-    });
-  });
-
-  it('should return an error when image does not exist', async () => {
-    await expectAsync(
-      doesImageExist({
-        filename: 'nonExistingImage',
-        fileType: '.jpg',
-        height: 100,
-        width: 100,
-      })
-    ).toBeRejectedWithError();
-  });
-
-  it('should return an absolute path for fjord image', (): void => {
-    const path = getAbsolutePathForImage('fjord', '.jpg', 'full');
-
-    expect(path).toEqual(resolve('assets/full/fjord.jpg'));
   });
 });

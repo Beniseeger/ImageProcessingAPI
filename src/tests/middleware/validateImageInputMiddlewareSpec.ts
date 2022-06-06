@@ -5,7 +5,7 @@ import { mockResponse } from 'mock-req-res';
 describe('testing validate middleware', (): void => {
   const mkReponse = mockResponse();
 
-  const nextFunction = () => {
+  const nextFunction = (): void => {
     console.log('Going to the next middleware');
   };
 
@@ -22,12 +22,15 @@ describe('testing validate middleware', (): void => {
       mkReponse,
       nextFunction
     );
-    expect(logMessage).toMatch('Please specify a height for the image!');
+    expect(logMessage).toMatch(
+      'Error: please specify a width and height for the api.'
+    );
   });
 
-  it('should retrun a width error message when no width is provided', (): void => {
+  it('should retrun a width error message when width is provided wrong', (): void => {
     const mockRequest = {
       query: {
+        width: 'hdash',
         height: '100',
         filename: 'fjord',
       },
@@ -38,7 +41,9 @@ describe('testing validate middleware', (): void => {
       mkReponse,
       nextFunction
     );
-    expect(logMessage).toMatch('Please specify a width for the image!');
+    expect(logMessage).toMatch(
+      'Error: Please enter a positive number for the width of the image!'
+    );
   });
 
   it('should retrun a filename error message when no filename is provided', (): void => {
@@ -55,11 +60,11 @@ describe('testing validate middleware', (): void => {
       nextFunction
     );
     expect(logMessage).toMatch(
-      'Please specify an image which should be resized!'
+      'Error: Please specify an image by the parameter filename which should be resized!'
     );
   });
 
-  it('should retrun No Error when all parameters are specified', (): void => {
+  it('should return No Error when all parameters are specified', (): void => {
     const mockRequest = {
       query: {
         height: '100',

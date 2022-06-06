@@ -29,7 +29,6 @@
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "jasmin": "^0.0.2",
     "jasmine": "^4.1.0",
     "jasmine-spec-reporter": "^7.0.0",
     "mock-req-res": "^1.2.0",
